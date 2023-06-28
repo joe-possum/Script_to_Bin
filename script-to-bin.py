@@ -43,7 +43,8 @@ def read_git() :
 cwd = os.getcwd()
 for psource in sources :
     path = os.path.dirname(psource)
-    os.chdir(path)
+    if '' != path :
+        os.chdir(path)
     source = os.path.basename(psource)
     if len(source) < 3 :
         exit_help("can't determine type of ';%s'"%(source))
@@ -108,4 +109,4 @@ if len(sys.argv) > 1 :
         fh.write(out)
         fh.close()
         os.chmod(path,int("0700",8))
-        
+    os.chdir(cwd)
