@@ -24,23 +24,30 @@ if len(params) < 2 :
 dest = params[-1]
 sources = params[:-1]
 
-fh = os.popen('git log | grep Date','r')
-text = fh.read()
-fh.close()
-lines = text.split('\n')
-date = lines[0]
-fh = open('.git/config','r')
-text = fh.read()
-fh.close()
-lines = text.split('\n')
-for line in lines :
-    tokens = line.split("url = ")
-    if 2 == len(tokens) :
-        url = tokens[1]
+def read_git() :
+    fh = os.popen('git log | grep Date','r')
+    text = fh.read()
+    fh.close()
+    lines = text.split('\n')
+    date = lines[0]
+    fh = open('.git/config','r')
+    text = fh.read()
+    fh.close()
+    lines = text.split('\n')
+    for line in lines :
+        tokens = line.split("url = ")
+        if 2 == len(tokens) :
+            url = tokens[1]
+    return date,url
 
-for source in sources :
+cwd = os.getcwd()
+for psource in sources :
+    path = os.path.dirname(psource)
+    os.chdir(path)
+    source = os.path.basename(psource)
     if len(source) < 3 :
         exit_help("can't determine type of ';%s'"%(source))
+    date,url = read_git()
     extension = source[-3:]
     executable = source[:-3].split('/')[-1]
     if '.py' == extension :
@@ -73,7 +80,7 @@ for source in sources :
         out = header + '\n'
         for i in range(first_import) :
             out += lines[i] + '\n'
-        if not got_sys and not_got_getopt :
+        if not got_sys and not got_getopt :
             out += 'import sys\n'
         for i in range(first_import, last_import+1) :
             out += lines[i] + '\n'
