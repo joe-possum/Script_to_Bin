@@ -30,7 +30,15 @@ def read_git() :
     fh.close()
     lines = text.split('\n')
     date = lines[0]
-    fh = open('.git/config','r')
+    path = '.git'
+    while True :
+        try :
+            fh = open(path+'/config','r')
+            break
+        except FileNotFoundError :
+            path = '../' + path
+            if '/..git' == os.path.realpath(path) :
+                raise RuntimeError('.git not found')
     text = fh.read()
     fh.close()
     lines = text.split('\n')
